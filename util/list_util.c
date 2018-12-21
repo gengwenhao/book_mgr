@@ -41,9 +41,10 @@ int load(BookInfo *list, const char *file_name) {
 
 /* 初始化book_list */
 BookInfo *create_book_node() {
-    BookInfo *info = (BookInfo *) malloc(sizeof(BookInfo));
-    info->next = NULL;
-    return info;
+    BookInfo *new_node = (BookInfo *) malloc(sizeof(BookInfo));
+    memset(new_node, 0, sizeof(BookInfo));
+    new_node->next = NULL;
+    return new_node;
 }
 
 /* 获得新结点并赋值 */
@@ -98,6 +99,26 @@ void remove_book_item_by_book_no(BookInfo *head, const char *book_no) {
     BookInfo *free_p = tmp->next;
     tmp->next = tmp->next->next;
     free(free_p);
+}
+
+/* 通过书名查找图书 */
+void find_book_item_by_book_name(BookInfo *head, const char *book_name) {
+    if (NULL == head) {
+        printf("head is None");
+        return;
+    }
+
+    int count = 0;
+
+    BookInfo *tmp = head;
+    while (tmp->next) {
+        if (!strcmp(tmp->next->book_name, book_name)) {
+            count++;
+        }
+        tmp = tmp->next;
+    }
+
+    printf("count:%d", count);
 }
 
 /* 打印图书信息 */

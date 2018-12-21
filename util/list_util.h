@@ -44,6 +44,7 @@ void remove_book_item_by_book_no(BookInfo *head, const char *book_no);
 
 void print_book_lst(BookInfo *head);
 
+void find_book_item_by_book_name(BookInfo *head, const char *book_no);
 
 void destroy_lst(BookInfo *head);
 
