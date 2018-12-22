@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "list_util.h"
+#include "book_model.h"
 
-
+/* 图书借阅状态 */
 typedef enum BOOK_STATUS {
     HAS_LENT,
     HAS_NOT_LENT,

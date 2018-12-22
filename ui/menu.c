@@ -28,7 +28,6 @@ void show_book_mgr_menu() {
 }
 
 /* 显示读者管理菜单 */
-
 void show_reader_mgr_menu() {
     printf("============读者管理===========\n");
     printf("==========1.新增读者===========\n");
@@ -67,7 +66,6 @@ void show_lead_mgr_menu() {
 }
 
 /* 显示查看菜单 */
-
 void show_search_menu() {
     printf("============查看===========\n");
     printf("==========1.书籍信息查询===========\n");
@@ -129,4 +127,3 @@ void show_menu() {
     /* 尾递归 */
     show_menu();
 }
-
