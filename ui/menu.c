@@ -20,21 +20,35 @@ void show_book_mgr_menu() {
 
     switch (sel_id) {
         case 1:
+            /* 数组置空 */
+            memset(book_no, 0, sizeof(book_no));
+            memset(book_name, 0, sizeof(book_name));
+            memset(type, 0, sizeof(type));
+
+            /* 输入信息 */
             printf("输入书籍序号：\n");
             scanf("%s", book_no);
             printf("输入书籍名称：\n");
             scanf("%s", book_name);
             printf("输入书籍类型：\n");
             scanf("%s", type);
+
+            /* 添加图书信息 */
             if (add_book_detail(book_no, book_name, type)) {
+                system("cls");
                 printf("添加完成:图书序号:%s 图书名称:%s 图书类别:%s\n", book_no, book_name, type);
             } else {
+                system("cls");
                 printf("图书添加失败!\n");
             }
+
             break;
         case 2:
+            /* 数组置空 */
             memset(book_no, 0, sizeof(book_name));
             printf("输入要修改的书籍序号:\n");
+
+            /* 输入信息 */
             scanf("%s", book_no);
 
             /* 查找图书信息 */
@@ -49,8 +63,13 @@ void show_book_mgr_menu() {
             scanf("%s", book_name);
             printf("输入书籍新类型：\n");
             scanf("%s", type);
+
+            /* 赋值 */
             strcpy(book_info->book_name, book_name);
             strcpy(book_info->book_no, book_no);
+
+            /* 显示新数据 */
+            system("cls");
             printf("修改完成:图书序号:%s 图书名称:%s 图书类别:%s\n",
                    book_info->book_no,
                    book_info->book_name,
@@ -76,8 +95,25 @@ void show_reader_mgr_menu() {
     int sel_id = -1;
     scanf("%d", &sel_id);
 
+    /* 输入数据定义 */
+    char *reader_no = {0}, *reader_name = {0};
+
     switch (sel_id) {
         case 1:
+            printf("输入读者ID：\n");
+            scanf("%s", reader_no);
+            printf("输入读者姓名：\n");
+            scanf("%s", reader_name);
+
+            /* 添加人员信息 */
+            if (add_reader_detail(reader_no, reader_name)) {
+                system("cls");
+                printf("添加完成:人员姓名:%s 人员ID:%s\n", reader_name, reader_no);
+            } else {
+                system("cls");
+                printf("人员添加失败!\n");
+            }
+
             break;
         case 2:
             break;
@@ -129,20 +165,21 @@ void show_search_menu() {
 
     switch (sel_id) {
         case 1:
+            /* 数组置空 */
             memset(book_no, 0, sizeof(book_no));
-            memset(book_name, 0, sizeof(book_name));
 
+            /* 输入信息 */
             printf("输入书籍序号:\n");
-            scanf("%d", book_no);
+            scanf("%s", book_no);
 
             /* 查询书籍 */
             BookInfo *book_info = search_book_info(NULL, book_no);
             if (NULL == book_info) {
                 system("cls");
                 printf("书籍未找到!\n");
-                break;
             } else {
-                printf("书籍信息: 名称:%s 序号:%s 类别:%s 借阅状态:%s",
+                system("cls");
+                printf("已找到书籍信息: 名称:%s 序号:%s 类别:%s 借阅状态:%s",
                        book_info->book_name,
                        book_info->book_no,
                        book_info->type,
@@ -150,6 +187,25 @@ void show_search_menu() {
             }
             break;
         case 2:
+            /* 数组置空 */
+            memset(reader_no, 0, sizeof(reader_no));
+
+            /* 输入信息 */
+            printf("输入读者ID:\n");
+            scanf("%s", reader_no);
+
+            /* 查询人员 */
+            ReaderInfo *reader_info = search_reader_info(NULL, reader_no);
+            if (NULL == reader_info) {
+                system("cls");
+                printf("该人员信息未找到!\n");
+            } else {
+                system("cls");
+                printf("已找到人员信息: 姓名:%s ID:%s",
+                       reader_info->reader_no,
+                       reader_info->reader_name);
+            }
+
             break;
         case 3:
             break;

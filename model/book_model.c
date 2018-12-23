@@ -74,7 +74,7 @@ int add_book_detail(char *book_no, char *book_name, char *type) {
     strcpy(book_info->book_name, book_name);
     strcpy(book_info->type, type);
 
-    /* 添加到列表 */
+    /* 添加到链表 */
     add_book_info(book_info);
 
     return 1;
@@ -128,9 +128,10 @@ void add_reader_info(ReaderInfo *reader_info) {
 }
 
 /* 根据详细信息添加读者 */
-void add_reader_detail(char *reader_no, char *reader_name) {
+int add_reader_detail(char *reader_no, char *reader_name) {
     /* 开辟空间 */
     ReaderInfo *reader_info = malloc(sizeof(ReaderInfo));
+    if (NULL == reader_info) return 0;
 
     /* 初始化 */
     reader_info->next = NULL;
@@ -138,6 +139,11 @@ void add_reader_detail(char *reader_no, char *reader_name) {
     /* 赋值 */
     strcpy(reader_info->reader_no, reader_no);
     strcpy(reader_info->reader_name, reader_name);
+
+    /* 添加到链表 */
+    add_reader_info(reader_info);
+
+    return 1;
 }
 
 /* 查找读者 */

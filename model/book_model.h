@@ -92,7 +92,7 @@ BookInfo *search_book_info(char *book_name,
 void add_reader_info(ReaderInfo *reader_info);
 
 /* 根据详细信息添加读者 */
-void add_reader_detail(char *reader_no,
+int add_reader_detail(char *reader_no,
                        char *reader_name);
 
 /* 查找读者 */
