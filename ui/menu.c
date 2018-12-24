@@ -1,8 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "menu.h"
 #include "../model/book_model.h"
+
+/* 获取当前时间 */
+char *get_time() {
+    /* 指针数组-字符串 */
+    char *wday[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+    time_t timep;
+    struct tm *p;
+    time(&timep);
+    /* 获取当前时间 */
+    p = localtime(&timep);
+
+    char *time_str = malloc(sizeof(char) * 100);
+    sprintf(time_str, "%d年%d月%d日 %s %d:%d\n", (1900 + p->tm_year), (1 + p->tm_mon), p->tm_mday, wday[p->tm_wday],
+            p->tm_hour,
+            p->tm_min);
+
+    return time_str;
+}
 
 /* 显示书籍管理菜单 */
 void show_book_mgr_menu() {
@@ -17,6 +36,9 @@ void show_book_mgr_menu() {
 
     /* 书籍序号，名称，类别 */
     char book_no[16], book_name[16], type[16];
+
+    /* 查找到的书籍信息 */
+    BookInfo *find_info = NULL;
 
     switch (sel_id) {
         case 1:
@@ -46,14 +68,15 @@ void show_book_mgr_menu() {
         case 2:
             /* 数组置空 */
             memset(book_no, 0, sizeof(book_name));
+            find_info = NULL;
             printf("输入要修改的书籍序号:\n");
 
             /* 输入信息 */
             scanf("%s", book_no);
 
             /* 查找图书信息 */
-            BookInfo *book_info = search_book_info(NULL, book_no);
-            if (NULL == book_info) {
+            find_info = search_book_info(NULL, book_no);
+            if (NULL == find_info) {
                 printf("未找到图书信息\n");
                 break;
             }
@@ -61,21 +84,46 @@ void show_book_mgr_menu() {
             /* 更新信息 */
             printf("输入书籍新名称：\n");
             scanf("%s", book_name);
-            printf("输入书籍新类型：\n");
-            scanf("%s", type);
 
             /* 赋值 */
-            strcpy(book_info->book_name, book_name);
-            strcpy(book_info->book_no, book_no);
+            strcpy(find_info->book_name, book_name);
 
             /* 显示新数据 */
             system("cls");
             printf("修改完成:图书序号:%s 图书名称:%s 图书类别:%s\n",
-                   book_info->book_no,
-                   book_info->book_name,
-                   book_info->type);
+                   find_info->book_no,
+                   find_info->book_name,
+                   find_info->type);
             break;
         case 3:
+            /* 数组置空 */
+            memset(book_no, 0, sizeof(book_no));
+            find_info = NULL;
+            printf("输入要修改类型的书籍序号:\n");
+
+            /* 输入信息 */
+            scanf("%s", book_no);
+
+            /* 查找图书信息 */
+            find_info = search_book_info(NULL, book_no);
+            if (NULL == find_info) {
+                printf("未找到图书信息\n");
+                break;
+            }
+
+            /* 更新信息 */
+            printf("输入书籍新类型：\n");
+            scanf("%s", type);
+
+            /* 赋值 */
+            strcpy(find_info->type, type);
+
+            /* 显示新数据 */
+            system("cls");
+            printf("修改完成:图书序号:%s 图书名称:%s 图书类别:%s\n",
+                   find_info->book_no,
+                   find_info->book_name,
+                   find_info->type);
             break;
         default:
             return;
@@ -96,10 +144,13 @@ void show_reader_mgr_menu() {
     scanf("%d", &sel_id);
 
     /* 输入数据定义 */
-    char *reader_no = {0}, *reader_name = {0};
+    char reader_no[32] = {0}, reader_name[32] = {0};
+    ReaderInfo *find_info = NULL;
+    BorrowedRecord *find_record_info = NULL;
 
     switch (sel_id) {
         case 1:
+            /* 输入读者信息 */
             printf("输入读者ID：\n");
             scanf("%s", reader_no);
             printf("输入读者姓名：\n");
@@ -116,8 +167,48 @@ void show_reader_mgr_menu() {
 
             break;
         case 2:
+            /* 数组置空 */
+            memset(reader_no, 0, sizeof(reader_no));
+            memset(reader_name, 0, sizeof(reader_name));
+            find_info = NULL;
+            printf("输入要修改的人员ID:\n");
+
+            /* 输入信息 */
+            scanf("%s", reader_no);
+
+            /* 查找人员信息 */
+            find_info = search_reader_info(NULL, reader_no);
+            if (NULL == find_info) {
+                printf("未找到该人员信息\n");
+                break;
+            }
+
+            /* 更新信息 */
+            printf("请输入新的姓名：\n");
+            scanf("%s", reader_name);
+
+            /* 赋值 */
+            strcpy(find_info->reader_name, reader_name);
+
+            /* 显示新数据 */
+            system("cls");
+            printf("修改完成:读者ID:%s 姓名:%s\n",
+                   find_info->reader_no,
+                   find_info->reader_name);
             break;
         case 3:
+            /* 数组置空 */
+            memset(reader_no, 0, sizeof(reader_no));
+            find_record_info = NULL;
+
+            /* 输入 */
+            printf("输入要查看记录人员ID:\n");
+            scanf("%s", reader_no);
+
+            /* 打印结果 */
+            int count = print_record_info(reader_no);
+            printf("==========================%d条记录\n", count);
+
             break;
         default:
             return;
@@ -136,10 +227,79 @@ void show_lead_mgr_menu() {
     int sel_id = 0;
     scanf("%d", &sel_id);
 
+    /* 输入数据定义 */
+    char time[32] = {0}, book_no[16] = {0}, reader_no[16] = {0}, msg[32] = {0};
+    BorrowedRecord *find_info = NULL;
+    BookInfo *find_book_info = NULL;
+    ReaderInfo *find_reader_info = NULL;
+
     switch (sel_id) {
         case 1:
+            memset(time, 0, sizeof(time));
+            memset(book_no, 0, sizeof(book_no));
+            memset(reader_no, 0, sizeof(reader_no));
+            memset(msg, 0, sizeof(msg));
+            find_info = NULL;
+
+            /* 输入图书名称 */
+            printf("输入要借图书ID：\n");
+            scanf("%s", book_no);
+            printf("输入读者ID：\n");
+            scanf("%s", reader_no);
+            printf("输入留言：\n");
+            scanf("%s", msg);
+
+            /* 添加时间 */
+            char *time_str = get_time();
+
+            /* 添加人员信息 */
+            if (add_record_detail(time_str, reader_no, book_no, msg)) {
+                free(time_str);
+                system("cls");
+
+                /* 查找图书和人员 */
+                find_book_info = search_book_info(NULL, book_no);
+                find_reader_info = search_reader_info(NULL, reader_no);
+                if (NULL == find_book_info || NULL == find_reader_info) {
+                    printf("借阅失败!\n");
+                    return;
+                }
+
+                /* 打印借阅信息 */
+                printf("借书完成！时间:%s 人员ID:%s 人员姓名:%s 图书序号:%s 图书姓名:%s\n",
+                       time,
+                       find_reader_info->reader_no,
+                       find_reader_info->reader_name,
+                       find_book_info->book_no,
+                       find_book_info->book_name);
+            } else {
+                system("cls");
+                printf("人员添加失败!\n");
+            }
             break;
         case 2:
+            /* 数组置空 */
+            memset(book_no, 0, sizeof(book_no));
+            memset(reader_no, 0, sizeof(reader_no));
+            find_info = NULL;
+            find_book_info = NULL;
+            find_reader_info = NULL;
+
+            /* 输入图书名称 */
+            printf("输入要还图书ID：\n");
+            scanf("%s", book_no);
+            printf("输入借书人员ID：\n");
+            scanf("%s", reader_no);
+
+            /* 查找借书记录 */
+            find_info = search_record_info(reader_no, book_no);
+            if (NULL == find_info) {
+                printf("借书记录未找到！\n");
+                return;
+            }
+
+            find_info->is_delete = 1;
+
             break;
         default:
             return;
@@ -185,6 +345,7 @@ void show_search_menu() {
                        book_info->type,
                        book_info->status == HAS_LENT ? "借出\n" : "未借出\n");
             }
+
             break;
         case 2:
             /* 数组置空 */
@@ -201,7 +362,7 @@ void show_search_menu() {
                 printf("该人员信息未找到!\n");
             } else {
                 system("cls");
-                printf("已找到人员信息: 姓名:%s ID:%s",
+                printf("已找到人员信息: 姓名:%s ID:%s\n",
                        reader_info->reader_no,
                        reader_info->reader_name);
             }

@@ -183,7 +183,7 @@ ReaderInfo *search_reader_info(char *reader_name, char *reader_no) {
 }
 
 /* 阅读记录操作 */
-/* 阅读记录操作 */
+/* 添加阅读记录 */
 void add_record_info(BorrowedRecord *record_info) {
     if (NULL == record_info) {
         return;
@@ -193,19 +193,23 @@ void add_record_info(BorrowedRecord *record_info) {
     record_lst->next = record_info;
 }
 
-/* 根据详细信息添加阅读记录 */
-void add_record_detail(char *time, char *reader_no, char *book_no, char *msg) {
+/* 根据详细信息添加借阅记录 */
+int add_record_detail(char *time, char *reader_no, char *book_no, char *msg) {
     /* 开辟空间 */
     BorrowedRecord *record_info = malloc(sizeof(BorrowedRecord));
+    if (NULL == record_info) return 0;
 
     /* 初始化 */
     record_info->next = NULL;
+    record_info->is_delete = 0;
 
     /* 赋值 */
     strcpy(record_info->time, time);
     strcpy(record_info->reader_no, reader_no);
     strcpy(record_info->book_no, book_no);
     strcpy(record_info->msg, msg);
+
+    return 1;
 }
 
 /* 查找阅读记录 */
@@ -215,31 +219,52 @@ BorrowedRecord *search_record_info(char *reader_no, char *book_no) {
         return NULL;
     }
 
+    if (NULL != reader_no && NULL != book_no) {
+        BorrowedRecord *p = record_lst;
+
+        while (p->next) {
+            p = p->next;
+            if (0 == strcmp(p->reader_no, reader_no) && 0 == strcmp(p->book_no, book_no)) {
+                return p;
+            }
+        }
+
+        printf("not found record reader_no: %s book_no: %s\n", reader_no, book_no);
+    }
+
+
+    return NULL;
+}
+
+/* 打印读者阅读记录 */
+int print_record_info(char *reader_no) {
+    int count = 0;
+
     if (NULL != reader_no) {
         BorrowedRecord *p = record_lst;
+        BookInfo *find_book_info = NULL;
+        ReaderInfo *find_reader_info = NULL;
 
         while (p->next) {
             p = p->next;
             if (0 == strcmp(p->reader_no, reader_no)) {
-                return p;
-            }
-        }
+                /* 查找图书和人员 */
+                find_book_info = search_book_info(NULL, p->book_no);
+                find_reader_info = search_reader_info(NULL, p->reader_no);
 
-        printf("not found reader_no: %s\n", reader_no);
-        return NULL;
+                /* 打印借阅信息 */
+                printf("时间:%s 人员ID:%s 人员姓名:%s 图书序号:%s 图书姓名:%s\n",
+                       p->time,
+                       find_reader_info->reader_no,
+                       find_reader_info->reader_name,
+                       find_book_info->book_no,
+                       find_book_info->book_name);
+
+                ++count;
+            }
+
+        }
     }
 
-    if (NULL != book_no) {
-        BorrowedRecord *p = record_lst;
-
-        while (p->next) {
-            p = p->next;
-            if (0 == strcmp(p->book_no, book_no)) {
-                return p;
-            }
-        }
-
-        printf("not found book_no: %s\n", book_no);
-        return NULL;
-    }
+    return count;
 }

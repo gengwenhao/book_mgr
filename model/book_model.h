@@ -59,6 +59,9 @@ typedef struct BorrowedRecord {
 
     /* 借阅信息 */
     char msg[32];
+
+    /* 失效 */
+    int is_delete;
     struct BorrowedRecord *next;
 } BorrowedRecord;
 
@@ -74,6 +77,7 @@ typedef struct BorrowedRecord {
  * 添加阅读记录 void add_record_info(BorrowedRecord *record_info)
  * 根据详细信息添加阅读记录 void add_record_detail(char *time, char *reader_no, char *book_no, char *msg)
  * 查找阅读记录 BorrowedRecord *search_record_info(char *reader_no, char *book_no)
+ * 打印读者阅读记录 int print_record_info(char *reader_no)
 */
 
 /* 添加图书 */
@@ -81,8 +85,8 @@ void add_book_info(BookInfo *book_info);
 
 /* 根据详细信息添加图书 */
 int add_book_detail(char *book_no,
-                     char *book_name,
-                     char *type);
+                    char *book_name,
+                    char *type);
 
 /* 查找图书 */
 BookInfo *search_book_info(char *book_name,
@@ -93,7 +97,7 @@ void add_reader_info(ReaderInfo *reader_info);
 
 /* 根据详细信息添加读者 */
 int add_reader_detail(char *reader_no,
-                       char *reader_name);
+                      char *reader_name);
 
 /* 查找读者 */
 ReaderInfo *search_reader_info(char *reader_name,
@@ -103,13 +107,16 @@ ReaderInfo *search_reader_info(char *reader_name,
 void add_record_info(BorrowedRecord *record_info);
 
 /* 根据详细信息添加阅读记录 */
-void add_record_detail(char *time,
-                       char *reader_no,
-                       char *book_no,
-                       char *msg);
+int add_record_detail(char *time,
+                      char *reader_no,
+                      char *book_no,
+                      char *msg);
 
 /* 查找阅读记录 */
 BorrowedRecord *search_record_info(char *reader_no,
                                    char *book_no);
+
+/* 打印读者阅读记录 */
+int print_record_info(char *reader_no);
 
 #endif //BOOK_MGR_20181220_UTIL_H
