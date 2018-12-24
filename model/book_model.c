@@ -18,6 +18,92 @@ void init() {
     record_lst->next = NULL;
 }
 
+/* 保存 */
+void save(char *book_db_name, char *reader_db_name, char *record_db_name) {
+    BookInfo *book_p = book_lst;
+    ReaderInfo *reader_p = reader_lst;
+    BorrowedRecord *record_p = record_lst;
+
+    if (NULL == book_db_name) {
+        book_db_name = "book.db";
+    }
+    if (NULL == reader_db_name) {
+        reader_db_name = "reader.db";
+    }
+    if (NULL == record_db_name) {
+        record_db_name = "record.db";
+    }
+
+    FILE *fp_book = fopen(book_db_name, "w");
+    FILE *fp_reader = fopen(reader_db_name, "w");
+    FILE *fp_record = fopen(record_db_name, "w");
+    if (NULL == fp_book || NULL == fp_reader || NULL == fp_record) {
+        printf("load file error！\n");
+    }
+
+    while (book_p->next) {
+        book_p = book_p->next;
+        fwrite(book_p, sizeof(BookInfo), 1, fp_book);
+    }
+
+    while (reader_p->next) {
+        reader_p = reader_p->next;
+        fwrite(reader_p, sizeof(ReaderInfo), 1, fp_reader);
+    }
+
+    while (record_p->next) {
+        record_p = record_p->next;
+        fwrite(record_p, sizeof(BorrowedRecord), 1, fp_record);
+    }
+
+    fclose(fp_book);
+    fclose(fp_reader);
+    fclose(fp_record);
+}
+
+/* 读取 */
+void load(char *book_db_name, char *reader_db_name, char *record_db_name) {
+    if (NULL == book_lst || NULL == reader_lst || NULL == record_lst) {
+        printf("lst not init");
+    }
+
+    if (NULL == book_db_name) {
+        book_db_name = "book.db";
+    }
+    if (NULL == reader_db_name) {
+        reader_db_name = "reader.db";
+    }
+    if (NULL == record_db_name) {
+        record_db_name = "record.db";
+    }
+
+    FILE *fp_book = fopen(book_db_name, "r");
+    FILE *fp_reader = fopen(reader_db_name, "r");
+    FILE *fp_record = fopen(record_db_name, "r");
+    if (NULL == fp_book || NULL == fp_reader || NULL == fp_record) {
+        printf("load file error！\n");
+    }
+
+    while (book_lst->next) {
+        book_lst = book_lst->next;
+        fread(book_lst, sizeof(BookInfo), 1, fp_book);
+    }
+
+    while (reader_lst->next) {
+        reader_lst = reader_lst->next;
+        fwrite(reader_lst, sizeof(ReaderInfo), 1, fp_reader);
+    }
+
+    while (record_lst->next) {
+        record_lst = record_lst->next;
+        fwrite(record_lst, sizeof(BorrowedRecord), 1, fp_record);
+    }
+
+    fclose(fp_book);
+    fclose(fp_reader);
+    fclose(fp_record);
+}
+
 /* 释放 */
 void destroy() {
     BookInfo *book_p = book_lst;
@@ -235,6 +321,35 @@ BorrowedRecord *search_record_info(char *reader_no, char *book_no) {
 
 
     return NULL;
+}
+
+/* 打印所有借阅记录信息 */
+int print_all_record_info() {
+    int count = 0;
+    BorrowedRecord *p = record_lst;
+    BookInfo *find_book_info = NULL;
+    ReaderInfo *find_reader_info = NULL;
+
+    system("cls");
+
+    while (p->next) {
+        p = p->next;
+        /* 查找图书和人员 */
+        find_book_info = search_book_info(NULL, p->book_no);
+        find_reader_info = search_reader_info(NULL, p->reader_no);
+
+        /* 打印借阅信息 */
+        printf("时间:%s 人员ID:%s 人员姓名:%s 图书序号:%s 图书姓名:%s\n",
+               p->time,
+               find_reader_info->reader_no,
+               find_reader_info->reader_name,
+               find_book_info->book_no,
+               find_book_info->book_name);
+
+        ++count;
+    }
+
+    return count;
 }
 
 /* 打印读者阅读记录 */

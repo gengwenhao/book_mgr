@@ -12,6 +12,7 @@ char *get_time() {
     time_t timep;
     struct tm *p;
     time(&timep);
+
     /* 获取当前时间 */
     p = localtime(&timep);
 
@@ -43,6 +44,7 @@ void show_book_mgr_menu() {
     switch (sel_id) {
         case 1:
             system("cls");
+
             /* 数组置空 */
             memset(book_no, 0, sizeof(book_no));
             memset(book_name, 0, sizeof(book_name));
@@ -70,7 +72,6 @@ void show_book_mgr_menu() {
             system("cls");
             /* 数组置空 */
             memset(book_no, 0, sizeof(book_name));
-            find_info = NULL;
             printf("输入要修改的书籍序号:\n");
 
             /* 输入信息 */
@@ -101,7 +102,6 @@ void show_book_mgr_menu() {
             system("cls");
             /* 数组置空 */
             memset(book_no, 0, sizeof(book_no));
-            find_info = NULL;
             printf("输入要修改类型的书籍序号:\n");
 
             /* 输入信息 */
@@ -214,7 +214,8 @@ void show_reader_mgr_menu() {
             /* 打印结果 */
             system("cls");
             int count = print_record_info(reader_no);
-            printf("=========================================%d条记录===========================================\n", count);
+            printf("=========================================%d条记录===========================================\n",
+                   count);
             break;
         default:
             return;
@@ -248,7 +249,6 @@ void show_lead_mgr_menu() {
             memset(book_no, 0, sizeof(book_no));
             memset(reader_no, 0, sizeof(reader_no));
             memset(msg, 0, sizeof(msg));
-            find_info = NULL;
 
             /* 输入图书名称 */
             printf("输入要借图书ID：\n");
@@ -258,6 +258,22 @@ void show_lead_mgr_menu() {
             printf("输入留言：\n");
             scanf("%s", msg);
 
+            /* 查找图书和人员 */
+            find_book_info = search_book_info(NULL, book_no);
+            find_reader_info = search_reader_info(NULL, reader_no);
+            if (NULL == find_book_info) {
+                printf("借阅失败!未找到该图书信息\n");
+                break;
+            }
+            if (HAS_LENT == find_book_info->status) {
+                printf("借阅失败!该图书已经借出\n");
+                break;
+            }
+            if (NULL == find_reader_info) {
+                printf("借阅失败!未找到读者信息\n");
+                break;
+            }
+
             /* 添加时间 */
             char *time_str = get_time();
 
@@ -266,13 +282,8 @@ void show_lead_mgr_menu() {
                 free(time_str);
                 system("cls");
 
-                /* 查找图书和人员 */
-                find_book_info = search_book_info(NULL, book_no);
-                find_reader_info = search_reader_info(NULL, reader_no);
-                if (NULL == find_book_info || NULL == find_reader_info) {
-                    printf("借阅失败!\n");
-                    return;
-                }
+                /* 修改图书借出状态 */
+                find_book_info->status = HAS_LENT;
 
                 /* 打印借阅信息 */
                 printf("借书完成！时间:%s 人员ID:%s 人员姓名:%s 图书序号:%s 图书姓名:%s\n",
@@ -285,6 +296,7 @@ void show_lead_mgr_menu() {
                 system("cls");
                 printf("人员添加失败!\n");
             }
+
             break;
         case 2:
             system("cls");
@@ -292,9 +304,6 @@ void show_lead_mgr_menu() {
             /* 数组置空 */
             memset(book_no, 0, sizeof(book_no));
             memset(reader_no, 0, sizeof(reader_no));
-            find_info = NULL;
-            find_book_info = NULL;
-            find_reader_info = NULL;
 
             /* 输入图书名称 */
             printf("输入要还图书ID：\n");
@@ -305,11 +314,21 @@ void show_lead_mgr_menu() {
             /* 查找借书记录 */
             find_info = search_record_info(reader_no, book_no);
             if (NULL == find_info) {
+                system("cls");
                 printf("借书记录未找到！\n");
-                return;
+                break;
             }
 
             find_info->is_delete = 1;
+
+            /* 查找图书 */
+            find_book_info = search_book_info(NULL, find_info->book_no);
+            if (NULL == find_book_info) {
+                system("cls");
+                printf("借阅记录中的图书未找到!\n");
+                break;
+            }
+            find_book_info->status = HAS_NOT_LENT;
 
             break;
         default:
@@ -380,6 +399,7 @@ void show_search_menu() {
 
             break;
         case 3:
+            print_all_record_info();
             break;
         default:
             return;

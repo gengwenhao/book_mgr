@@ -7,6 +7,12 @@
 
 int test();
 
+/* 保存 */
+void save(char *book_db_name, char *reader_db_name, char *record_db_name);
+
+/* 读取 */
+void load(char *book_db_name, char *reader_db_name, char *record_db_name);
+
 /* 初始化 */
 void init();
 
@@ -77,6 +83,7 @@ typedef struct BorrowedRecord {
  * 添加阅读记录 void add_record_info(BorrowedRecord *record_info)
  * 根据详细信息添加阅读记录 void add_record_detail(char *time, char *reader_no, char *book_no, char *msg)
  * 查找阅读记录 BorrowedRecord *search_record_info(char *reader_no, char *book_no)
+ * 打印所有借阅记录信息 int print_all_record_info()
  * 打印读者阅读记录 int print_record_info(char *reader_no)
 */
 
@@ -115,6 +122,9 @@ int add_record_detail(char *time,
 /* 查找阅读记录 */
 BorrowedRecord *search_record_info(char *reader_no,
                                    char *book_no);
+
+/* 打印所有借阅记录信息 */
+int print_all_record_info();
 
 /* 打印读者阅读记录 */
 int print_record_info(char *reader_no);
