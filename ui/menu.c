@@ -16,7 +16,7 @@ char *get_time() {
     p = localtime(&timep);
 
     char *time_str = malloc(sizeof(char) * 100);
-    sprintf(time_str, "%d年%d月%d日 %s %d:%d\n", (1900 + p->tm_year), (1 + p->tm_mon), p->tm_mday, wday[p->tm_wday],
+    sprintf(time_str, "%d年%d月%d日 %s %d:%d", (1900 + p->tm_year), (1 + p->tm_mon), p->tm_mday, wday[p->tm_wday],
             p->tm_hour,
             p->tm_min);
 
@@ -42,6 +42,7 @@ void show_book_mgr_menu() {
 
     switch (sel_id) {
         case 1:
+            system("cls");
             /* 数组置空 */
             memset(book_no, 0, sizeof(book_no));
             memset(book_name, 0, sizeof(book_name));
@@ -66,6 +67,7 @@ void show_book_mgr_menu() {
 
             break;
         case 2:
+            system("cls");
             /* 数组置空 */
             memset(book_no, 0, sizeof(book_name));
             find_info = NULL;
@@ -96,6 +98,7 @@ void show_book_mgr_menu() {
                    find_info->type);
             break;
         case 3:
+            system("cls");
             /* 数组置空 */
             memset(book_no, 0, sizeof(book_no));
             find_info = NULL;
@@ -150,6 +153,7 @@ void show_reader_mgr_menu() {
 
     switch (sel_id) {
         case 1:
+            system("cls");
             /* 输入读者信息 */
             printf("输入读者ID：\n");
             scanf("%s", reader_no);
@@ -177,6 +181,7 @@ void show_reader_mgr_menu() {
             scanf("%s", reader_no);
 
             /* 查找人员信息 */
+            system("cls");
             find_info = search_reader_info(NULL, reader_no);
             if (NULL == find_info) {
                 printf("未找到该人员信息\n");
@@ -197,6 +202,7 @@ void show_reader_mgr_menu() {
                    find_info->reader_name);
             break;
         case 3:
+            system("cls");
             /* 数组置空 */
             memset(reader_no, 0, sizeof(reader_no));
             find_record_info = NULL;
@@ -206,9 +212,9 @@ void show_reader_mgr_menu() {
             scanf("%s", reader_no);
 
             /* 打印结果 */
+            system("cls");
             int count = print_record_info(reader_no);
-            printf("==========================%d条记录\n", count);
-
+            printf("=========================================%d条记录===========================================\n", count);
             break;
         default:
             return;
@@ -235,6 +241,9 @@ void show_lead_mgr_menu() {
 
     switch (sel_id) {
         case 1:
+            system("cls");
+
+            /* 数组置空 */
             memset(time, 0, sizeof(time));
             memset(book_no, 0, sizeof(book_no));
             memset(reader_no, 0, sizeof(reader_no));
@@ -278,6 +287,8 @@ void show_lead_mgr_menu() {
             }
             break;
         case 2:
+            system("cls");
+
             /* 数组置空 */
             memset(book_no, 0, sizeof(book_no));
             memset(reader_no, 0, sizeof(reader_no));

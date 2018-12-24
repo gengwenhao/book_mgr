@@ -7,7 +7,7 @@ static BookInfo *book_lst = NULL;
 static ReaderInfo *reader_lst = NULL;
 static BorrowedRecord *record_lst = NULL;
 
-/* åˆå§‹åŒ– */
+/* ³õÊ¼»¯ */
 void init() {
     book_lst = (BookInfo *) malloc(sizeof(BookInfo));
     reader_lst = (ReaderInfo *) malloc(sizeof(ReaderInfo));
@@ -18,7 +18,7 @@ void init() {
     record_lst->next = NULL;
 }
 
-/* é‡Šæ”¾ */
+/* ÊÍ·Å */
 void destroy() {
     BookInfo *book_p = book_lst;
     if (NULL != book_p) {
@@ -48,8 +48,8 @@ void destroy() {
     }
 }
 
-/*  å›¾ä¹¦æ“ä½œ */
-/* æ·»åŠ å›¾ä¹¦ */
+/*  Í¼Êé²Ù×÷ */
+/* Ìí¼ÓÍ¼Êé */
 void add_book_info(BookInfo *book_info) {
     if (NULL == book_lst) {
         return;
@@ -59,28 +59,28 @@ void add_book_info(BookInfo *book_info) {
     book_lst->next = book_info;
 }
 
-/* æ ¹æ®è¯¦ç»†ä¿¡æ¯æ·»åŠ å›¾ä¹¦ */
+/* ¸ù¾İÏêÏ¸ĞÅÏ¢Ìí¼ÓÍ¼Êé */
 int add_book_detail(char *book_no, char *book_name, char *type) {
-    /* å¼€è¾Ÿç©ºé—´ */
+    /* ¿ª±Ù¿Õ¼ä */
     BookInfo *book_info = malloc(sizeof(BookInfo));
     if (NULL == book_info) return 0;
 
-    /* åˆå§‹åŒ– */
+    /* ³õÊ¼»¯ */
     book_info->next = NULL;
     book_info->status = HAS_NOT_LENT;
 
-    /* èµ‹å€¼ */
+    /* ¸³Öµ */
     strcpy(book_info->book_no, book_no);
     strcpy(book_info->book_name, book_name);
     strcpy(book_info->type, type);
 
-    /* æ·»åŠ åˆ°é“¾è¡¨ */
+    /* Ìí¼Óµ½Á´±í */
     add_book_info(book_info);
 
     return 1;
 }
 
-/* æŸ¥æ‰¾å›¾ä¹¦ */
+/* ²éÕÒÍ¼Êé */
 BookInfo *search_book_info(char *book_name, char *book_no) {
     if (NULL == book_lst) {
         printf("book_lst is NULL\n");
@@ -116,8 +116,8 @@ BookInfo *search_book_info(char *book_name, char *book_no) {
     }
 }
 
-/* è¯»è€…æ“ä½œ */
-/* æ·»åŠ è¯»è€… */
+/* ¶ÁÕß²Ù×÷ */
+/* Ìí¼Ó¶ÁÕß */
 void add_reader_info(ReaderInfo *reader_info) {
     if (NULL == reader_lst) {
         return;
@@ -127,26 +127,26 @@ void add_reader_info(ReaderInfo *reader_info) {
     reader_lst->next = reader_info;
 }
 
-/* æ ¹æ®è¯¦ç»†ä¿¡æ¯æ·»åŠ è¯»è€… */
+/* ¸ù¾İÏêÏ¸ĞÅÏ¢Ìí¼Ó¶ÁÕß */
 int add_reader_detail(char *reader_no, char *reader_name) {
-    /* å¼€è¾Ÿç©ºé—´ */
+    /* ¿ª±Ù¿Õ¼ä */
     ReaderInfo *reader_info = malloc(sizeof(ReaderInfo));
     if (NULL == reader_info) return 0;
 
-    /* åˆå§‹åŒ– */
+    /* ³õÊ¼»¯ */
     reader_info->next = NULL;
 
-    /* èµ‹å€¼ */
+    /* ¸³Öµ */
     strcpy(reader_info->reader_no, reader_no);
     strcpy(reader_info->reader_name, reader_name);
 
-    /* æ·»åŠ åˆ°é“¾è¡¨ */
+    /* Ìí¼Óµ½Á´±í */
     add_reader_info(reader_info);
 
     return 1;
 }
 
-/* æŸ¥æ‰¾è¯»è€… */
+/* ²éÕÒ¶ÁÕß */
 ReaderInfo *search_reader_info(char *reader_name, char *reader_no) {
     if (NULL == reader_lst) {
         printf("reader_lst is NULL\n");
@@ -163,7 +163,6 @@ ReaderInfo *search_reader_info(char *reader_name, char *reader_no) {
             }
         }
 
-        printf("not found reader_name: %s\n", reader_name);
         return NULL;
     }
 
@@ -177,13 +176,12 @@ ReaderInfo *search_reader_info(char *reader_name, char *reader_no) {
             }
         }
 
-        printf("not found reader_no: %s\n", reader_no);
         return NULL;
     }
 }
 
-/* é˜…è¯»è®°å½•æ“ä½œ */
-/* æ·»åŠ é˜…è¯»è®°å½• */
+/* ÔÄ¶Á¼ÇÂ¼²Ù×÷ */
+/* Ìí¼ÓÔÄ¶Á¼ÇÂ¼ */
 void add_record_info(BorrowedRecord *record_info) {
     if (NULL == record_info) {
         return;
@@ -193,26 +191,29 @@ void add_record_info(BorrowedRecord *record_info) {
     record_lst->next = record_info;
 }
 
-/* æ ¹æ®è¯¦ç»†ä¿¡æ¯æ·»åŠ å€Ÿé˜…è®°å½• */
+/* ¸ù¾İÏêÏ¸ĞÅÏ¢Ìí¼Ó½èÔÄ¼ÇÂ¼ */
 int add_record_detail(char *time, char *reader_no, char *book_no, char *msg) {
-    /* å¼€è¾Ÿç©ºé—´ */
+    /* ¿ª±Ù¿Õ¼ä */
     BorrowedRecord *record_info = malloc(sizeof(BorrowedRecord));
     if (NULL == record_info) return 0;
 
-    /* åˆå§‹åŒ– */
+    /* ³õÊ¼»¯ */
     record_info->next = NULL;
     record_info->is_delete = 0;
 
-    /* èµ‹å€¼ */
+    /* ¸³Öµ */
     strcpy(record_info->time, time);
     strcpy(record_info->reader_no, reader_no);
     strcpy(record_info->book_no, book_no);
     strcpy(record_info->msg, msg);
 
+    /* Ìí¼Ó */
+    add_record_info(record_info);
+
     return 1;
 }
 
-/* æŸ¥æ‰¾é˜…è¯»è®°å½• */
+/* ²éÕÒÔÄ¶Á¼ÇÂ¼ */
 BorrowedRecord *search_record_info(char *reader_no, char *book_no) {
     if (NULL == record_lst) {
         printf("record_lst is NULL\n");
@@ -236,7 +237,7 @@ BorrowedRecord *search_record_info(char *reader_no, char *book_no) {
     return NULL;
 }
 
-/* æ‰“å°è¯»è€…é˜…è¯»è®°å½• */
+/* ´òÓ¡¶ÁÕßÔÄ¶Á¼ÇÂ¼ */
 int print_record_info(char *reader_no) {
     int count = 0;
 
@@ -248,12 +249,12 @@ int print_record_info(char *reader_no) {
         while (p->next) {
             p = p->next;
             if (0 == strcmp(p->reader_no, reader_no)) {
-                /* æŸ¥æ‰¾å›¾ä¹¦å’Œäººå‘˜ */
+                /* ²éÕÒÍ¼ÊéºÍÈËÔ± */
                 find_book_info = search_book_info(NULL, p->book_no);
                 find_reader_info = search_reader_info(NULL, p->reader_no);
 
-                /* æ‰“å°å€Ÿé˜…ä¿¡æ¯ */
-                printf("æ—¶é—´:%s äººå‘˜ID:%s äººå‘˜å§“å:%s å›¾ä¹¦åºå·:%s å›¾ä¹¦å§“å:%s\n",
+                /* ´òÓ¡½èÔÄĞÅÏ¢ */
+                printf("Ê±¼ä:%s ÈËÔ±ID:%s ÈËÔ±ĞÕÃû:%s Í¼ÊéĞòºÅ:%s Í¼ÊéĞÕÃû:%s\n",
                        p->time,
                        find_reader_info->reader_no,
                        find_reader_info->reader_name,
