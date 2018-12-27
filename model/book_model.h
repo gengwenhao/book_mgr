@@ -8,10 +8,14 @@
 int test();
 
 /* 保存 */
-void save(char *book_db_name, char *reader_db_name, char *record_db_name);
+void save(char *book_db_name,
+          char *reader_db_name,
+          char *record_db_name);
 
 /* 读取 */
-void load(char *book_db_name, char *reader_db_name, char *record_db_name);
+void load(char *book_db_name,
+          char *reader_db_name,
+          char *record_db_name);
 
 /* 初始化 */
 void init();
@@ -34,6 +38,9 @@ typedef struct BookInfo {
     /* 书籍名称 */
     char book_name[16];
 
+    /* 作者姓名 */
+    char writer_name[16];
+
     /* 书籍ID */
     char type[16];
 
@@ -41,6 +48,13 @@ typedef struct BookInfo {
     BOOK_STATUS status;
     struct BookInfo *next;
 } BookInfo;
+
+/* 图书存书数 */
+typedef struct BookCount {
+    int count;
+    char book_name[32];
+    struct BookCount *next;
+} BookCount;
 
 /* 读者信息 */
 typedef struct ReaderInfo {
@@ -73,8 +87,12 @@ typedef struct BorrowedRecord {
 
 /* 操作
  * 添加图书 void add_book_info(BookInfo *book_info)
- * 根据详细信息添加图书 void add_book_detail(char *book_no, char *book_name, char *type)
+ * 根据详细信息添加图书 int add_book_detail(char *book_no, char *book_name, char *type, char *writer_name)
+ * 通过作者姓名打印图书 print_book_info_by_writer_name
  * 查找图书 BookInfo *search_book_info(char *book_name, char *book_no)
+ * 添加图书数量记录 void add_book_count_info(char *book_name)
+ * 更新图书数量 void update_book_count(char *book_name)
+ * 查找图书数量记录 BookCount *search_book_count_info(char *book_name)
  *
  * 添加读者 void add_reader_info(ReaderInfo *reader_info)
  * 根据详细信息添加读者 void add_reader_detail(char *reader_no, char *reader_name)
@@ -93,11 +111,25 @@ void add_book_info(BookInfo *book_info);
 /* 根据详细信息添加图书 */
 int add_book_detail(char *book_no,
                     char *book_name,
-                    char *type);
+                    char *type,
+                    char *writer_name);
+
+/* 通过作者姓名查找图书 */
+void print_book_info_by_writer_name(char *writer_name);
 
 /* 查找图书 */
 BookInfo *search_book_info(char *book_name,
                            char *book_no);
+
+
+/* 添加图书数量记录 */
+void add_book_count_info(char *book_name, int count);
+
+/* 更新图书数量 */
+void update_book_count(char *book_name);
+
+/* 查找图书数量记录 */
+BookCount *search_book_count_info(char *book_name);
 
 /* 添加读者 */
 void add_reader_info(ReaderInfo *reader_info);
@@ -113,13 +145,13 @@ ReaderInfo *search_reader_info(char *reader_name,
 /* 添加阅读记录 */
 void add_record_info(BorrowedRecord *record_info);
 
-/* 根据详细信息添加阅读记录 */
+/* 根据详细信息添加借阅记录 */
 int add_record_detail(char *time,
                       char *reader_no,
                       char *book_no,
                       char *msg);
 
-/* 查找阅读记录 */
+/* 查找借阅记录 */
 BorrowedRecord *search_record_info(char *reader_no,
                                    char *book_no);
 

@@ -4,7 +4,7 @@
 #include "ui/menu.h"
 #include "model/book_model.h"
 
-int main(int argc, char *argv[]) {
+void run() {
     /* ≥ı ºªØ */
     init();
 
@@ -19,6 +19,11 @@ int main(int argc, char *argv[]) {
 
     /*  Õ∑≈ */
     destroy();
+}
+
+int main(int argc, char *argv[]) {
+    run();
+
     return 0;
 }
 

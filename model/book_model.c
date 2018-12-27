@@ -6,20 +6,25 @@
 static BookInfo *book_lst = NULL;
 static ReaderInfo *reader_lst = NULL;
 static BorrowedRecord *record_lst = NULL;
+static BookCount *book_count_lst = NULL;
 
 /* 初始化 */
 void init() {
     book_lst = (BookInfo *) malloc(sizeof(BookInfo));
     reader_lst = (ReaderInfo *) malloc(sizeof(ReaderInfo));
     record_lst = (BorrowedRecord *) malloc(sizeof(BorrowedRecord));
+    book_count_lst = (BookCount *) malloc(sizeof(BookCount));
 
     book_lst->next = NULL;
     reader_lst->next = NULL;
     record_lst->next = NULL;
+    book_count_lst->next = NULL;
 }
 
 /* 保存 */
-void save(char *book_db_name, char *reader_db_name, char *record_db_name) {
+void save(char *book_db_name,
+          char *reader_db_name,
+          char *record_db_name) {
     BookInfo *book_p = book_lst;
     ReaderInfo *reader_p = reader_lst;
     BorrowedRecord *record_p = record_lst;
@@ -38,7 +43,8 @@ void save(char *book_db_name, char *reader_db_name, char *record_db_name) {
     FILE *fp_reader = fopen(reader_db_name, "w");
     FILE *fp_record = fopen(record_db_name, "w");
     if (NULL == fp_book || NULL == fp_reader || NULL == fp_record) {
-        printf("load file error！\n");
+        printf("未读取到本地记录！\n");
+        return;
     }
 
     while (book_p->next) {
@@ -81,22 +87,59 @@ void load(char *book_db_name, char *reader_db_name, char *record_db_name) {
     FILE *fp_reader = fopen(reader_db_name, "r");
     FILE *fp_record = fopen(record_db_name, "r");
     if (NULL == fp_book || NULL == fp_reader || NULL == fp_record) {
-        printf("load file error！\n");
+        printf("未读取到完整的本地记录！\n");
     }
 
-    while (book_lst->next) {
-        book_lst = book_lst->next;
-        fread(book_lst, sizeof(BookInfo), 1, fp_book);
+    while (1) {
+        /* 创建空结点 */
+        BookInfo *book_info = (BookInfo *) malloc(sizeof(BookInfo));
+
+        /* 读取内容 */
+        int count = fread(book_info, sizeof(BookInfo), 1, fp_book);
+
+        /* 没有读到释放结点跳出循环 */
+        if (count == 0) {
+            free(book_info);
+            break;
+        }
+
+        /* 添加到链表 */
+        //update_book_count(book_info->book_name);
+        add_book_info(book_info);
     }
 
-    while (reader_lst->next) {
-        reader_lst = reader_lst->next;
-        fwrite(reader_lst, sizeof(ReaderInfo), 1, fp_reader);
+    while (1) {
+        /* 创建空结点 */
+        ReaderInfo *reader_info = (ReaderInfo *) malloc(sizeof(ReaderInfo));
+
+        /* 读取内容 */
+        int count = fread(reader_info, sizeof(ReaderInfo), 1, fp_reader);
+
+        /* 没有读到释放结点跳出循环 */
+        if (count == 0) {
+            free(reader_info);
+            break;
+        }
+
+        /* 添加到链表 */
+        add_reader_info(reader_info);
     }
 
-    while (record_lst->next) {
-        record_lst = record_lst->next;
-        fwrite(record_lst, sizeof(BorrowedRecord), 1, fp_record);
+    while (1) {
+        /* 创建空结点 */
+        BorrowedRecord *record_info = (BorrowedRecord *) malloc(sizeof(BorrowedRecord));
+
+        /* 读取内容 */
+        int count = fread(record_info, sizeof(BorrowedRecord), 1, fp_record);
+
+        /* 没有读到释放结点跳出循环 */
+        if (count == 0) {
+            free(record_info);
+            break;
+        }
+
+        /* 添加到链表 */
+        add_record_info(record_info);
     }
 
     fclose(fp_book);
@@ -141,12 +184,13 @@ void add_book_info(BookInfo *book_info) {
         return;
     }
 
+
     book_info->next = book_lst->next;
     book_lst->next = book_info;
 }
 
 /* 根据详细信息添加图书 */
-int add_book_detail(char *book_no, char *book_name, char *type) {
+int add_book_detail(char *book_no, char *book_name, char *type, char *writer_name) {
     /* 开辟空间 */
     BookInfo *book_info = malloc(sizeof(BookInfo));
     if (NULL == book_info) return 0;
@@ -159,11 +203,39 @@ int add_book_detail(char *book_no, char *book_name, char *type) {
     strcpy(book_info->book_no, book_no);
     strcpy(book_info->book_name, book_name);
     strcpy(book_info->type, type);
+    strcpy(book_info->writer_name, writer_name);
 
     /* 添加到链表 */
     add_book_info(book_info);
+    //update_book_count(book_name);
 
     return 1;
+}
+
+/* 通过作者姓名打印图书 */
+void print_book_info_by_writer_name(char *writer_name) {
+    if (NULL == book_lst) {
+        printf("book_lst is NULL\n");
+        return;
+    }
+
+    if (NULL != writer_name) {
+        BookInfo *p = book_lst;
+
+        while (p->next) {
+            p = p->next;
+            if (0 == strncmp(p->writer_name, writer_name, strlen(writer_name))) {
+                printf("已找到书籍信息: 名称:%s 序号:%s 作者:%s 类别:%s 书籍数量:%d 借阅状态:%s",
+                       p->book_name,
+                       p->book_no,
+                       p->writer_name,
+                       p->type,
+                       search_book_count_info(p->book_name)->count,
+                       p->status == HAS_LENT ? "借出\n" : "未借出\n");
+            }
+        }
+
+    }
 }
 
 /* 查找图书 */
@@ -200,6 +272,67 @@ BookInfo *search_book_info(char *book_name, char *book_no) {
         printf("not found book_no: %s\n", book_no);
         return NULL;
     }
+}
+
+/* 添加图书数量记录 */
+void add_book_count_info(char *book_name, int count) {
+    if (NULL == book_name) {
+        return;
+    }
+
+    /* 创建空间 */
+    BookCount *new_count_info = (BookCount *) malloc(sizeof(BookCount));
+
+    /* 赋值 */
+    new_count_info->count = count;
+    strcpy(new_count_info->book_name, book_name);
+
+    /* 添加结点 */
+    new_count_info->next = book_count_lst->next;
+    book_count_lst->next = new_count_info;
+}
+
+/* 添加图书数量 */
+void update_book_count(char *book_name) {
+    if (NULL == book_name || NULL == book_count_lst) {
+        return;
+    }
+
+    BookCount *p = book_count_lst;
+
+    /* 根据书名查找记录 */
+    while (p->next) {
+        p = p->next;
+        if (0 == strncmp(p->book_name, book_name, strlen(book_name))) {
+            p->count++;
+            return;
+        }
+    }
+
+    /* 未找到记录 */
+    add_book_count_info(book_name, 1);
+}
+
+/* 查找图书数量记录 */
+BookCount *search_book_count_info(char *book_name) {
+    if (NULL == book_name) {
+        printf("book_count_lst is NULL\n");
+        return NULL;
+    }
+
+    if (NULL != book_name) {
+        BookCount *p = book_count_lst;
+
+        while (p->next) {
+            p = p->next;
+            if (0 == strncmp(p->book_name, book_name, strlen(book_name))) {
+                return p;
+            }
+        }
+
+        return NULL;
+    }
+
 }
 
 /* 读者操作 */
@@ -266,8 +399,8 @@ ReaderInfo *search_reader_info(char *reader_name, char *reader_no) {
     }
 }
 
-/* 阅读记录操作 */
-/* 添加阅读记录 */
+/* 借阅记录操作 */
+/* 添加借阅记录 */
 void add_record_info(BorrowedRecord *record_info) {
     if (NULL == record_info) {
         return;
@@ -339,12 +472,13 @@ int print_all_record_info() {
         find_reader_info = search_reader_info(NULL, p->reader_no);
 
         /* 打印借阅信息 */
-        printf("时间:%s 人员ID:%s 人员姓名:%s 图书序号:%s 图书姓名:%s\n",
+        printf("时间:%s 人员ID:%s 人员姓名:%s 图书序号:%s 图书姓名:%s 状态:%s\n",
                p->time,
                find_reader_info->reader_no,
                find_reader_info->reader_name,
                find_book_info->book_no,
-               find_book_info->book_name);
+               find_book_info->book_name,
+               p->is_delete ? "已归还" : "未归还");
 
         ++count;
     }
@@ -369,12 +503,13 @@ int print_record_info(char *reader_no) {
                 find_reader_info = search_reader_info(NULL, p->reader_no);
 
                 /* 打印借阅信息 */
-                printf("时间:%s 人员ID:%s 人员姓名:%s 图书序号:%s 图书姓名:%s\n",
+                printf("时间:%s 人员ID:%s 人员姓名:%s 图书序号:%s 图书姓名:%s 状态:%s\n",
                        p->time,
                        find_reader_info->reader_no,
                        find_reader_info->reader_name,
                        find_book_info->book_no,
-                       find_book_info->book_name);
+                       find_book_info->book_name,
+                       p->is_delete ? "已归还" : "未归还");
 
                 ++count;
             }

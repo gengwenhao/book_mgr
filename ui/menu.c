@@ -36,7 +36,7 @@ void show_book_mgr_menu() {
     scanf("%d", &sel_id);
 
     /* 书籍序号，名称，类别 */
-    char book_no[16], book_name[16], type[16];
+    char book_no[16], book_name[16], type[16], writer_name[16];
 
     /* 查找到的书籍信息 */
     BookInfo *find_info = NULL;
@@ -57,11 +57,14 @@ void show_book_mgr_menu() {
             scanf("%s", book_name);
             printf("输入书籍类型：\n");
             scanf("%s", type);
+            printf("输入作者姓名：\n");
+            scanf("%s", writer_name);
 
             /* 添加图书信息 */
-            if (add_book_detail(book_no, book_name, type)) {
+            if (add_book_detail(book_no, book_name, type, writer_name)) {
                 system("cls");
-                printf("添加完成:图书序号:%s 图书名称:%s 图书类别:%s\n", book_no, book_name, type);
+                printf("添加完成:图书序号:%s 图书名称:%s 图书类别:%s 作者姓名:%s\n",
+                       book_no, book_name, type, writer_name);
             } else {
                 system("cls");
                 printf("图书添加失败!\n");
@@ -71,7 +74,7 @@ void show_book_mgr_menu() {
         case 2:
             system("cls");
             /* 数组置空 */
-            memset(book_no, 0, sizeof(book_name));
+            memset(book_no, 0, sizeof(book_no));
             printf("输入要修改的书籍序号:\n");
 
             /* 输入信息 */
@@ -84,12 +87,17 @@ void show_book_mgr_menu() {
                 break;
             }
 
+
             /* 更新信息 */
             printf("输入书籍新名称：\n");
             scanf("%s", book_name);
+            printf("输入书籍作者新名称：\n");
+            scanf("%s", writer_name);
 
             /* 赋值 */
             strcpy(find_info->book_name, book_name);
+            strcpy(find_info->writer_name, writer_name);
+            //update_book_count(book_name);
 
             /* 显示新数据 */
             system("cls");
@@ -123,10 +131,12 @@ void show_book_mgr_menu() {
 
             /* 显示新数据 */
             system("cls");
-            printf("修改完成:图书序号:%s 图书名称:%s 图书类别:%s\n",
+            printf("修改完成:图书序号:%s 图书名称:%s 图书类别:%s 作者姓名:%s\n",
                    find_info->book_no,
                    find_info->book_name,
-                   find_info->type);
+                   find_info->type,
+                   find_info->writer_name);
+
             break;
         default:
             return;
@@ -347,34 +357,68 @@ void show_search_menu() {
     printf("==========3.借阅信息查询=======\n");
     printf("==========4.返回上级===========\n");
 
-    int sel_id = -1;
+    int sel_id = -1, sel_type_id = -1;
     scanf("%d", &sel_id);
 
     /* 输入信息存储 */
-    char book_no[16] = {0}, book_name[16] = {0}, reader_no[16] = {0};
+    char book_no[16] = {0}, book_name[16] = {0},
+            reader_no[16] = {0}, writer_name[16] = {0};
+    BookInfo *book_info = NULL;
+    BookCount *book_count = NULL;
 
     switch (sel_id) {
         case 1:
             /* 数组置空 */
             memset(book_no, 0, sizeof(book_no));
 
-            /* 输入信息 */
-            printf("输入书籍序号:\n");
-            scanf("%s", book_no);
+            /* 输入 */
+            printf("1.按书籍序号查找书籍\n");
+            printf("2.按作者查找书籍\n");
+            scanf("%d", &sel_type_id);
 
-            /* 查询书籍 */
-            BookInfo *book_info = search_book_info(NULL, book_no);
-            if (NULL == book_info) {
+            /* 操作 */
+            if (1 == sel_type_id) {
+                /* 输入信息 */
+                printf("输入书籍序号:\n");
+                scanf("%s", book_no);
+
+                /* 查询书籍 */
+                book_info = search_book_info(NULL, book_no);
+                if (NULL == book_info) {
+                    system("cls");
+                    printf("书籍未找到!\n");
+                    break;
+                }
+
                 system("cls");
-                printf("书籍未找到!\n");
-            } else {
-                system("cls");
-                printf("已找到书籍信息: 名称:%s 序号:%s 类别:%s 借阅状态:%s",
+                printf("已找到书籍信息: 名称:%s 序号:%s 作者:%s 类别:%s 借阅状态:%s",
                        book_info->book_name,
                        book_info->book_no,
+                       book_info->writer_name,
                        book_info->type,
-                       book_info->status == HAS_LENT ? "借出\n" : "未借出\n");
+                       book_info->status == HAS_LENT ? "借出" : "未借出");
+
+                /* 更新图书数量统计 */
+                update_book_count(book_info->book_name);
+                book_count = search_book_count_info(book_info->book_name);
+                if (NULL == book_count) {
+                    printf("《%s》的数量统计未知\n", book_info->book_name);
+                } else {
+                    printf(" 数量统计:%d\n", book_count->count);
+                }
+
+            } else if (2 == sel_type_id) {
+                /* 输入信息 */
+                printf("输入书籍作者名称:\n");
+                scanf("%s", writer_name);
+
+                /* 显示书籍 */
+                system("cls");
+                print_book_info_by_writer_name(writer_name);
+            } else {
+                printf("你的输入有误!\n");
             }
+
 
             break;
         case 2:
